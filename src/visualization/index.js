@@ -1,7 +1,7 @@
 import { hierarchy, pack } from "d3-hierarchy";
 import { select } from "d3-selection";
 
-import { configurationDimension } from "../configuration.js";
+import { configuration, configurationDimension } from "../configuration.js";
 
 /**
  * BubbleChart is a area value visualization.
@@ -13,8 +13,11 @@ class BubbleChart {
     constructor(data, width=configurationDimension.width, height=configurationDimension.height) {
 
         // update self
+        this.artboard = null;
         this.dataSource = data;
         this.height = height;
+        this.label = null;
+        this.name = configuration.name;
         this.width = width;
 
     }
@@ -39,35 +42,95 @@ class BubbleChart {
     }
 
     /**
+     * Position and minimally style labels in SVG dom element.
+     */
+    configureLabels() {
+
+        // container
+        this.label
+            .attr("class", "lgv-label")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("dy", "0.35em");
+
+        // text items
+        this.label
+            .each((x, j, nodes) => {
+                select(this.label.nodes()[j])
+                    .selectAll("tspan")
+                    .data([x.data.name, x.data.value])
+                    .enter()
+                    .append("tspan")
+                    .text(d => d)
+                    .attr("x", 0)
+                    .attr("dy", (d, i) => `${i * 1}em`);
+            });
+
+    }
+
+    /**
+     * Position and minimally style nodes in SVG dom element.
+     */
+    configureNodes() {
+        this.node
+            .append("circle")
+            .attr("class", "lgv-node")
+            .attr("r", d => d.r);
+    }
+
+    /**
+     * Generate SVG artboard in the HTML DOM.
+     * @param {node} domNode - HTML node
+     * @returns A d3.js selection.
+     */
+    generateArtboard(domNode) {
+        return select(domNode)
+            .append("svg")
+            .attr("viewBox", `0 0 ${this.width} ${this.height}`)
+            .attr("class", this.name);
+    }
+
+    /**
+     * Generate labels in SVG element.
+     * @param {node} domNode - d3.js SVG selection
+     */
+    generateLabels(domNode) {
+        return domNode
+            .append("text");
+    }
+
+    /**
+     * Construct node shapes in HTML DOM.
+     * @param {node} domNode - HTML node
+     * @returns A d3.js selection.
+     */
+    generateNodes(domNode) {
+        return domNode.selectAll("g")
+            .data(this.data ? this.data.leaves() : [])
+            .join("g")
+            .attr("transform", d => `translate(${d.x + 1},${d.y + 1})`);
+    }
+
+    /**
      * Render visualization.
      * @param {node} domNode - HTML node
      */
     render(domNode) {
 
         // generate svg artboard
-        let artboard = select(domNode)
-            .append("svg")
-            .attr("viewBox", `0 0 ${this.width} ${this.height}`)
-            .attr("class", "lgv-bubble-chart");
+        this.artboard = this.generateArtboard(domNode);
 
         // generate group for each bubble
-        const node = artboard.selectAll("g")
-            .data(this.data.leaves())
-            .join("g")
-            .attr("id", d => `lgv-node-${d.data.id}`)
-            .attr("transform", d => `translate(${d.x + 1},${d.y + 1})`);
+        this.node = this.generateNodes(this.artboard);
 
-        // generate node
-        node.append("circle")
-            .attr("class", "lgv-bubble-chart-bubble")
-            .attr("r", d => d.r);
+        // position/style nodes
+        this.configureNodes();
 
-        // generate label
-        node.append("text")
-            .attr("class", "lgv-bubble-chart-label")
-            .attr("x", 0)
-            .attr("y", "0.5em")
-            .text(d => d.data.name);
+        // generate labels
+        this.label = this.generateLabels(this.node);
+
+        // position/style labels
+        this.configureLabels();
 
     }
 

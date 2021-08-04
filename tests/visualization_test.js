@@ -1,6 +1,6 @@
 import test from "ava";
 
-import { configurationDimension } from "../src/configuration.js";
+import { configuration, configurationDimension } from "../src/configuration.js";
 import { BubbleChart } from "../src/index.js";
 
 /******************** EMPTY VARIABLES ********************/
@@ -40,7 +40,7 @@ test("render", t => {
     bc.render(document.body);
 
     // get generated element
-    let artboard = document.querySelector(".lgv-bubble-chart");
+    let artboard = document.querySelector(`.${configuration.name}`);
 
     t.true(artboard !== undefined);
     t.true(artboard.nodeName == "svg");
@@ -93,7 +93,7 @@ test("render_params", t => {
     bct.render(document.body);
 
     // get generated element
-    let artboard = document.querySelector(".lgv-bubble-chart");
+    let artboard = document.querySelector(`.${configuration.name}`);
 
     t.true(artboard !== undefined);
     t.true(artboard.nodeName == "svg");
