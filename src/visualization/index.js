@@ -51,7 +51,7 @@ class BubbleChart {
             .attr("class", "lgv-label")
             .attr("x", 0)
             .attr("y", 0)
-            .attr("dy", "0.35em");
+            .attr("dy", "0.25em");
 
         // text items
         this.label
@@ -63,7 +63,7 @@ class BubbleChart {
                     .append("tspan")
                     .text(d => d)
                     .attr("x", 0)
-                    .attr("dy", (d, i) => `${i * 1}em`);
+                    .attr("dy", (d, i) => i == 0 ? "" : `${i * 1.25}em`);
             });
 
     }
