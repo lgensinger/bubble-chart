@@ -55,15 +55,15 @@ class BubbleChart {
 
         // text items
         this.label
-            .each((x, j, nodes) => {
-                select(this.label.nodes()[j])
+            .each((d, i, nodes) => {
+                select(nodes[i])
                     .selectAll("tspan")
-                    .data([x.data.name, x.data.value])
+                    .data([d.data.name, d.data.value])
                     .enter()
                     .append("tspan")
-                    .text(d => d)
+                    .text(x => x)
                     .attr("x", 0)
-                    .attr("dy", (d, i) => i == 0 ? "" : `${i * 1.25}em`);
+                    .attr("dy", (x, j) => j == 0 ? "" : `${j * 1.25}em`);
             });
 
     }
