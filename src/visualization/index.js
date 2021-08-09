@@ -20,6 +20,9 @@ class BubbleChart {
         this.name = configuration.name;
         this.width = width;
 
+        // using font size as the base unit of measure make responsiveness easier to manage across devices
+        this.artboardUnit = typeof window === "undefined" ? 16 : parseFloat(getComputedStyle(document.body).fontSize);
+
     }
 
     /**
@@ -45,27 +48,20 @@ class BubbleChart {
      * Position and minimally style labels in SVG dom element.
      */
     configureLabels() {
-
-        // container
         this.label
             .attr("class", "lgv-label")
             .attr("x", 0)
             .attr("y", 0)
-            .attr("dy", "0.25em");
-
-        // text items
-        this.label
             .each((d, i, nodes) => {
                 select(nodes[i])
                     .selectAll("tspan")
-                    .data([d.data.name, d.data.value])
+                    .data([d.data.label, d.data.value])
                     .enter()
                     .append("tspan")
                     .text(x => x)
                     .attr("x", 0)
-                    .attr("dy", (x, j) => j == 0 ? "" : `${j * 1.25}em`);
+                    .attr("dy", (x, j) => j == 0 ? "-0.1em" : `${j * 1.2}em`);
             });
-
     }
 
     /**
@@ -75,7 +71,35 @@ class BubbleChart {
         this.node
             .append("circle")
             .attr("class", "lgv-node")
-            .attr("r", d => d.r);
+            .attr("r", d => d.r)
+            .on("mouseover", (e,d) => {
+
+                // update class
+                select(e.target).attr("class", "lgv-node active");
+
+                // send event to parent
+                this.artboard.dispatch("nodemouseover", {
+                    bubbles: true,
+                    detail: {
+                        id: d.data.id,
+                        label: d.data.label,
+                        value: d.data.value,
+                        xy: [e.clientX + (this.artboardUnit / 2), e.clientY + (this.artboardUnit / 2)]
+                    }
+                });
+
+            })
+            .on("mouseout", (e,d) => {
+
+                // update class
+                select(e.target).attr("class", "lgv-node");
+
+                // send event to parent
+                this.artboard.dispatch("nodemouseout", {
+                    bubbles: true
+                });
+
+            });
     }
 
     /**
