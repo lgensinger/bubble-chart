@@ -72,6 +72,20 @@ class BubbleChart {
             .append("circle")
             .attr("class", "lgv-node")
             .attr("r", d => d.r)
+            .on("click", (e,d) => {
+
+                // send event to parent
+                this.artboard.dispatch("nodeclick", {
+                    bubbles: true,
+                    detail: {
+                        id: d.data.id,
+                        label: d.data.label,
+                        value: d.data.value,
+                        xy: [e.clientX + (this.artboardUnit / 2), e.clientY + (this.artboardUnit / 2)]
+                    }
+                });
+
+            })
             .on("mouseover", (e,d) => {
 
                 // update class
