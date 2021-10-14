@@ -14,6 +14,7 @@ class BubbleChart {
 
         // update self
         this.artboard = null;
+        this.container = null;
         this.dataSource = data;
         this.height = height;
         this.label = null;
@@ -56,8 +57,11 @@ class BubbleChart {
                 select(nodes[i])
                     .selectAll("tspan")
                     .data([d.data.label, d.data.value])
-                    .enter()
-                    .append("tspan")
+                    .join(
+                        enter => enter.append("tspan"),
+                        update => update,
+                        exit => exit.remove()
+                    )
                     .text(x => x)
                     .attr("x", 0)
                     .attr("dy", (x, j) => j == 0 ? "-0.1em" : `${j * 1.2}em`);
@@ -67,9 +71,16 @@ class BubbleChart {
     /**
      * Position and minimally style nodes in SVG dom element.
      */
+
     configureNodes() {
         this.node
-            .append("circle")
+            .selectAll("circle")
+            .data(d => d)
+            .join(
+                enter => enter.append("circle"),
+                update => update,
+                exit => exit.remove()
+            )
             .attr("class", "lgv-node")
             .attr("r", d => d.r)
             .on("click", (e,d) => {
@@ -118,13 +129,19 @@ class BubbleChart {
 
     /**
      * Generate SVG artboard in the HTML DOM.
-     * @param {node} domNode - HTML node
+     * @param {selection} domNode - d3 selection
      * @returns A d3.js selection.
      */
     generateArtboard(domNode) {
-        return select(domNode)
-            .append("svg")
-            .attr("viewBox", `0 0 ${this.width} ${this.height}`)
+        return domNode
+            .selectAll("svg")
+            .data([{height: this.height, width: this.width}])
+            .join(
+                enter => enter.append("svg"),
+                update => update,
+                exit => exit.remove()
+            )
+            .attr("viewBox", d => `0 0 ${d.width} ${d.height}`)
             .attr("class", this.name);
     }
 
@@ -134,29 +151,39 @@ class BubbleChart {
      */
     generateLabels(domNode) {
         return domNode
-            .append("text");
+            .selectAll("text")
+            .data(d => d)
+            .join(
+                enter => enter.append("text"),
+                update => update,
+                exit => exit.remove()
+            );
     }
 
     /**
      * Construct node shapes in HTML DOM.
-     * @param {node} domNode - HTML node
+     * @param {selection} domNode - d3 selection
      * @returns A d3.js selection.
      */
     generateNodes(domNode) {
-        return domNode.selectAll("g")
+        return domNode
+            .selectAll("g")
             .data(this.data ? this.data.leaves() : [])
-            .join("g")
+            .join(
+                enter => enter.append("g"),
+                update => update,
+                exit => exit.remove()
+            )
             .attr("transform", d => `translate(${d.x + 1},${d.y + 1})`);
     }
 
     /**
-     * Render visualization.
-     * @param {node} domNode - HTML node
+     * Generate visualization.
      */
-    render(domNode) {
+    generateVisualization() {
 
         // generate svg artboard
-        this.artboard = this.generateArtboard(domNode);
+        this.artboard = this.generateArtboard(this.container);
 
         // generate group for each bubble
         this.node = this.generateNodes(this.artboard);
@@ -169,6 +196,38 @@ class BubbleChart {
 
         // position/style labels
         this.configureLabels();
+
+    }
+
+    /**
+     * Render visualization.
+     * @param {node} domNode - HTML node
+     */
+    render(domNode) {
+
+        // update self
+        this.container = select(domNode);
+
+        // generate visualization
+        this.generateVisualization();
+
+    }
+
+    /**
+     * Update visualization.
+     * @param {object} data - key/values where each key is a series label and corresponding value is an array of values
+     * @param {integer} height - height of artboard
+     * @param {integer} width - width of artboard
+     */
+    update(data, width, height) {
+
+        // update self
+        this.dataSource = data;
+        this.height = height;
+        this.width = width;
+
+        // generate visualization
+        this.generateVisualization();
 
     }
 
