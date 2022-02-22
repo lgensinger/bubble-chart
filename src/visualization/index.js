@@ -199,7 +199,7 @@ class BubbleChart {
         this.configureLabels();
 
         // style bars from provided
-        this.styleBars(styles);
+        this.styleNodes(styles);
 
     }
 
@@ -219,16 +219,18 @@ class BubbleChart {
     }
 
     /**
-     * Style bars in SVG dom element.
+     * Style nodes in SVG dom element.
      */
-    styleBars(styles = null) {
+    styleNodes(styles = null) {
 
         // check if provided
         if (styles) {
 
             // add each declared style
             for (const key in styles) {
-                this.node.attr(key, styles[key]);
+                this.node
+                    .selectAll("circle")
+                    .attr(key, styles[key]);
             }
 
         }

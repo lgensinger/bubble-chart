@@ -70,6 +70,8 @@ Style is expected to be addressed via css. Any style not met by the visualizatio
 | Class | Element |
 | :-- | :-- |
 | `lgv-bubble-chart` | top-level svg element |
+| `lgv-node` | circle element |
+| `lgv-label` | circle text label element |
 
 ## Actively Develop
 

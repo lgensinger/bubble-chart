@@ -1,6 +1,6 @@
 {
   "name": "@lgv/bubble-chart",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "type": "module",
   "description": "ES6 d3.js bubble chart visualization",
   "main": "dist/stacked-bar-chart.bundle.js",
