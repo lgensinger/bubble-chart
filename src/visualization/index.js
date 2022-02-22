@@ -228,7 +228,7 @@ class BubbleChart {
 
             // add each declared style
             for (const key in styles) {
-                this.series.attr(key, styles[key]);
+                this.node.attr(key, styles[key]);
             }
 
         }
