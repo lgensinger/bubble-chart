@@ -3,7 +3,7 @@
   "version": "0.0.10",
   "type": "module",
   "description": "ES6 d3.js bubble chart visualization",
-  "main": "dist/stacked-bar-chart.bundle.js",
+  "main": "dist/bubble-chart.bundle.js",
   "module": "src/index.js",
   "directories": {
     "test": "tests"
